@@ -1,0 +1,186 @@
+module SQLToolkit
+
+  grammar SQL
+
+    rule sql_query
+      space? select_statement space?
+    end
+
+    rule select_statement
+      select from? where? group_by? having? order_by? limit?
+    end
+
+    rule select
+      "select" space projection (',' space? projection)*
+    end
+
+    rule projection
+      '*' / table '.' '*' / expression alias?
+    end
+
+    rule from
+      space from_clause
+    end
+
+    rule from_clause
+      "from" space source (space? ',' space? source)*
+    end
+
+    rule source
+      table alias? / subquery alias
+    end
+
+    rule subquery
+      '(' space? select_statement space? ')'
+    end
+
+    rule table
+      schema_table / identifier
+    end
+
+    rule schema_table
+      schema '.' identifier
+    end
+
+    rule schema
+      identifier
+    end
+
+    rule alias
+      space ('as' space)? identifier
+    end
+
+    rule where
+      space 'where' space expression
+    end
+
+    rule group_by
+      space 'group' space 'by' space expression (space? ',' space? expression)*
+    end
+
+    rule having
+      space 'having' space expression
+    end
+
+    rule order_by
+      space 'order' space 'by' space order_exression (space? ',' order_exression expression)*
+    end
+
+    rule limit
+      space 'limit' space integer (space 'offset' space integer)?
+    end
+
+    rule order_exression
+      expression space ('asc' / 'desc' (space 'nulls' space ('first' / 'last'))?)?
+    end
+
+    rule expression
+      boolean_expression
+    end
+
+    rule single_expression
+      (function_call / identifier / literal / subquery / '(' space? expression space? ')') (space? '::' space? type)?
+    end
+
+    rule type
+      unquoted_identifier
+    end
+
+    rule function_call
+      unquoted_identifier '(' (space? expression (space? ',' space? expression)*)? space? ')'
+    end
+
+    rule arithmetic_expression
+      single_expression (space? arithmetic_operator space? single_expression)*
+    end
+
+    rule arithmetic_operator
+      '+' / '-' / '*' / '/' / '%' / '||'
+    end
+
+    rule comparison_expression
+      'exist' space? subquery
+      /
+      arithmetic_expression space 'is' (space 'not')? space boolean
+      /
+      arithmetic_expression space ('not' space)? 'in' space list_of_values
+      /
+      arithmetic_expression (space? comparison_operator space? arithmetic_expression)?
+    end
+
+    rule list_of_values
+      subquery
+      /
+      '(' space? expression (space? ',' space? expression)* space? ')'
+    end
+
+    rule comparison_operator
+      '<=' / '>=' / '<>' / '>' / '<' / '!=' / '='
+    end
+
+    rule negatable_expression
+      ('not' space)? comparison_expression
+    end
+
+    rule boolean_expression
+      negatable_expression (space boolean_operator space negatable_expression)*
+    end
+
+    rule boolean_operator
+      'and' / 'or'
+    end
+
+    rule space
+      [ \t\r\n]+ (comment space?)?
+    end
+
+    rule comment
+      '--' [^\r\n]*
+    end
+
+    rule identifier
+      quoted_identifier / unquoted_identifier !{|seq| seq[0].reserved? }
+    end
+
+    rule unquoted_identifier
+      [A-Za-z] [_A-Za-z0-9]*
+      {
+        def reserved?
+          SQLToolkit::RESERVED_SQL_KEYWORDS.include?(text_value.downcase)
+        end
+      }
+    end
+
+    rule quoted_identifier
+      '"' [^"]* '"'
+    end
+
+    rule literal
+      string / integer
+    end
+
+    rule string
+      "'" [^']* "'"
+    end
+
+    rule boolean
+      true / false / null
+    end
+
+    rule true
+      'true' / 'TRUE'
+    end
+
+    rule false
+      'false' / 'FALSE'
+    end
+
+    rule null
+      'null' / 'NULL'
+    end
+
+    rule integer
+      "-"? [0-9]+
+    end
+  end
+end
