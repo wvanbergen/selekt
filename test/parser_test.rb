@@ -57,8 +57,8 @@ class ParserTest < Minitest::Unit::TestCase
   def test_comparison_operators
     assert parse('select 1 > 2')
     assert parse('select 1 + 2 > 2')
-    assert !parse('select 1 > 2 > 3')
     assert parse('select a > b')
+    assert_raises(RuntimeError) { parse('select 1 > 2 > 3') }
   end
 
   def test_boolean_tests

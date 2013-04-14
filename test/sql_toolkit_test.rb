@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'pry'
 
 class SQLToolkitTest < Minitest::Unit::TestCase
   include SQLToolkit
@@ -14,6 +13,11 @@ class SQLToolkitTest < Minitest::Unit::TestCase
     SQL
 
     assert_equal ['table1', 't2', 'table3'], source_names
+  end
+
+  def test_stubbing_sources
+    stubbed_sql = stub_source('select * from t1', 't1', 'select 1')
+    assert_equal "select * from (select 1) AS t1", stubbed_sql
   end
 
   def test_used_relations
