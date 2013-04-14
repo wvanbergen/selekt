@@ -9,6 +9,8 @@ module SQLToolkit
     'left', 'right', 'inner', 'full', 'outer', 'join', 'on', 'using', 'natural'
   ]
 
+  class ParseError < StandardError; end
+
   def parser
     @parser ||= begin
       Treetop.load(File.expand_path('./sql_toolkit/sql.treetop', File.dirname(__FILE__)))
@@ -17,7 +19,7 @@ module SQLToolkit
   end
 
   def parse(sql)
-    parser.parse(sql) or raise "Could not parse SQL query"
+    parser.parse(sql) or raise ParseError.new("Could not parse SQL query")
   end
 
   def used_relations(sql)
