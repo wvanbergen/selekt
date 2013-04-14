@@ -3,14 +3,10 @@ class SQLToolkit::Query
   class Relation < Struct.new(:schema_name, :table_name)
     def to_s
       if schema_name.nil?
-        safe_identifier(table_name)
+        SQLToolkit.safe_identifier(table_name)
       else
-        safe_identifier(schema_name) + '.' + safe_identifier(table_name)
+        SQLToolkit.safe_identifier(schema_name) + '.' + SQLToolkit.safe_identifier(table_name)
       end
-    end
-
-    def safe_identifier(id)
-      id.include?('"') ? '"' + id.gsub('"', '""') + '"' : id
     end
   end
 

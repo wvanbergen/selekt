@@ -12,6 +12,7 @@ module SQLToolkit
   ]
 
   class ParseError < StandardError; end
+  class StubError < StandardError; end
 
   def parser
     @parser ||= begin
@@ -23,8 +24,24 @@ module SQLToolkit
   def parse(sql)
     SQLToolkit::Query.new(sql)    
   end
+
+  def safe_identifier(id)
+    id =~ /\A[a-z][a-z0-9_]*\z/i ? id : '"' + id.gsub('"', '""') + '"'
+  end
+
+  def quote(val)
+    case val
+      when NilClass; 'NULL'
+      when TrueClass; 'TRUE'
+      when FalseClass; 'FALSE'
+      when Numeric; val.to_s
+      when String; "'" + val.gsub("'", "''") + "'"
+      else raise "Don't know how to quote #{val.inspect}!"
+    end
+  end
 end
 
 require "sql_toolkit/version"
 require "sql_toolkit/sql"
 require "sql_toolkit/query"
+require "sql_toolkit/source_stub"
