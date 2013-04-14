@@ -15,19 +15,19 @@ module SQLToolkit
     end
 
     rule from
-      space "from" space source (space? ',' space? source)*
+      space "from" space source_with_joins (space? ',' space? source_with_joins)*
+    end
+
+    rule source_with_joins
+       source join*
     end
 
     rule source
-       single_source join*
-    end
-
-    rule single_source
-      table alias? / subquery alias
+      ((table <TableReference>) (alias <Alias>)? / subquery (alias <Alias>)) <Source>
     end
 
     rule join
-      space regular_join_type space single_source space join_clause
+      space regular_join_type space source space join_clause
     end
 
     rule regular_join_type
@@ -75,7 +75,7 @@ module SQLToolkit
     end    
 
     rule alias
-      space ('as' space)? identifier
+      space ('as' space)? identifier 
     end
 
     rule where
@@ -188,7 +188,7 @@ module SQLToolkit
     end
 
     rule literal
-      string / integer
+      string / integer / float / boolean
     end
 
     rule string
@@ -200,19 +200,23 @@ module SQLToolkit
     end
 
     rule true
-      'true' / 'TRUE'
+      'true'
     end
 
     rule false
-      'false' / 'FALSE'
+      'false'
     end
 
     rule null
-      'null' / 'NULL'
+      'null'
     end
 
     rule integer
       "-"? [0-9]+
+    end
+
+    rule float
+      "-"? [0-9]* '.' [0-9]+
     end
   end
 end
