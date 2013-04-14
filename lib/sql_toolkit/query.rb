@@ -1,5 +1,19 @@
 class SQLToolkit::Query
 
+  class Relation < Struct.new(:schema_name, :table_name)
+    def to_s
+      if schema_name.nil?
+        safe_identifier(table_name)
+      else
+        safe_identifier(schema_name) + '.' + safe_identifier(table_name)
+      end
+    end
+
+    def safe_identifier(id)
+      id.include?('"') ? '"' + id.gsub('"', '""') + '"' : id
+    end
+  end
+
   attr_reader :ast
 
   def initialize(sql)
@@ -7,7 +21,7 @@ class SQLToolkit::Query
   end
 
   def relations
-    find_nodes(ast, SQLToolkit::SQL::TableReference).map(&:text_value).uniq
+    find_nodes(ast, SQLToolkit::SQL::TableReference).map { |tr| Relation.new(tr.schema_name, tr.table_name) }.uniq
   end
 
   def sources

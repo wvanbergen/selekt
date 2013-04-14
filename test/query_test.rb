@@ -20,11 +20,15 @@ class QueryTest < Minitest::Unit::TestCase
   end
 
   def test_relations
-    assert_equal ['a', 'b'], SQLToolkit.parse('select * from a t1, b t2').relations
-    assert_equal ["schema.table"], SQLToolkit.parse('select * from schema.table t1').relations
-    assert_equal ["schema.table1", "table2", "table3", "table5", "table6"], SQLToolkit.parse(<<-SQL).relations
+    assert_equal ['a', 'b'], SQLToolkit.parse('select * from a t1, b t2').relations.map(&:table_name)
+
+    query = SQLToolkit.parse('select * from schema.table t1 INNER JOIN schema.table t2 ON 1=1')
+    assert_equal ["schema"], query.relations.map(&:schema_name)
+    assert_equal ["table"], query.relations.map(&:table_name)
+    
+    query = SQLToolkit.parse(<<-SQL)
       SELECT *
-        FROM schema.table1 t1
+        FROM schema."table1" t1
         LEFT JOIN table2 t2 ON t1.id = t2.id
         WHERE EXIST (SELECT 1 FROM table3 WHERE value > t1.value)
           AND t1.id NOT IN (SELECT table1_id FROM table3)
@@ -34,8 +38,9 @@ class QueryTest < Minitest::Unit::TestCase
       SELECT *
         FROM table5 t5
         LEFT JOIN (
-          SELECT * FROM table6
+          SELECT * FROM schema.table6
         ) AS t6 ON t6.id = t5.id
     SQL
+    assert_equal ["schema.table1", "table2", "table3", "table5", "schema.table6"], query.relations.map(&:to_s)
   end
 end

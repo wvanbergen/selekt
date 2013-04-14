@@ -55,11 +55,31 @@ module SQLToolkit
     end
 
     rule table
-      schema_table / identifier
+      schema_table / schemaless_table
+    end
+
+    rule schemaless_table
+      identifier {
+        def schema_name
+          nil
+        end
+
+        def table_name
+          elements[0].value
+        end
+      }
     end
 
     rule schema_table
-      schema '.' identifier
+      schema '.' identifier {
+        def schema_name
+          schema.value
+        end
+
+        def table_name
+          elements.last.value
+        end
+      }
     end
 
     rule schema
@@ -204,12 +224,20 @@ module SQLToolkit
     end
 
     rule identifier
-      quoted_identifier / unquoted_identifier !{|seq| seq[0].reserved? }
+      quoted_identifier / unquoted_identifier !{|seq| seq[0].reserved? } {
+        def value
+          elements.first.value
+        end
+      }
     end
 
     rule unquoted_identifier
       [A-Za-z] [_A-Za-z0-9]*
       {
+        def value
+          text_value
+        end
+
         def reserved?
           SQLToolkit::RESERVED_SQL_KEYWORDS.include?(text_value.downcase)
         end
@@ -217,7 +245,11 @@ module SQLToolkit
     end
 
     rule quoted_identifier
-      '"' ('""' / [^"])* '"'
+      '"' body:('""' / [^"])* '"' {
+        def value
+          body.text_value.gsub('""', '"')
+        end
+      }
     end
 
     rule literal
