@@ -9,6 +9,12 @@ class ParserTest < Minitest::Unit::TestCase
     assert parse('select *')
     assert parse('select table.*, other')
     assert parse('select schema.table.*')
+    assert parse('select distinct schema.table.*')
+    assert parse('select min(table)')
+    assert parse('select count(*)')
+    assert parse('select count(distinct *)')
+    assert parse('select count(distinct id)')
+    assert parse('select count(1) AS number_of_records')
   end
 
   def test_sources
@@ -20,6 +26,7 @@ class ParserTest < Minitest::Unit::TestCase
 
   def test_joins
     assert parse('select * from table t1 join table t2 on t1.a = t2.a')
+    assert parse('select * from t1 full outer join t2 using (country, state)')
     assert parse(<<-SQL)
       SELECT *
         FROM table1 AS t1

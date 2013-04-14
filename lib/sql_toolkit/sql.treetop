@@ -11,11 +11,7 @@ module SQLToolkit
     end
 
     rule select
-      "select" space projection (',' space? projection)*
-    end
-
-    rule projection
-      '*' / table '.' '*' / expression alias?
+      "select" space ("distinct" space)? projection (',' space? projection)*
     end
 
     rule from
@@ -31,11 +27,17 @@ module SQLToolkit
     end
 
     rule join
-      space regular_join_type space single_source space 'on' space boolean_expression
+      space regular_join_type space single_source space join_clause
     end
 
     rule regular_join_type
       (('inner' / 'left' / 'right' / 'full' space 'outer') space)? 'join'
+    end
+
+    rule join_clause
+      'on' space boolean_expression
+      /
+      'using' space? '(' space? identifier (space? ',' space? identifier)* ')'
     end
 
     rule subquery
@@ -61,6 +63,16 @@ module SQLToolkit
     rule table_column
       identifier '.' identifier
     end
+
+    rule projection
+      '*' / table '.' '*' / aggregate_function_call alias? / expression alias?
+    end
+
+    rule aggregate_function_call
+    'count' '(' space? ('distinct' space)? ('*'  / expression) space? ')'
+      /
+      function_call
+    end    
 
     rule alias
       space ('as' space)? identifier
