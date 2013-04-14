@@ -6,7 +6,9 @@ module SQLToolkit
   RESERVED_SQL_KEYWORDS = [
     'select', 'from', 'where', 'group', 'order', 'having', 
     'limit', 'offset', 'as', 'by', 'with', 'distinct',
-    'left', 'right', 'inner', 'full', 'outer', 'join', 'on', 'using', 'natural'
+    'left', 'right', 'inner', 'full', 'outer', 'join', 'on', 'using', 'natural',
+    'case', 'when', 'then', 'else', 'end',
+    'over', 'partition', 'range', 'rows', 'window'
   ]
 
   class ParseError < StandardError; end

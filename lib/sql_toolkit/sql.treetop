@@ -3,11 +3,16 @@ module SQLToolkit
   grammar SQL
 
     rule sql_query
-      space? select_statement order_by_clause? limit_clause? space?
+      space? select_statement (space order_by_clause)? (space limit_clause)? space?
     end
 
     rule select_statement
-      select_clause from_clause? where_clause? group_by_clause? having_clause? (space set_operator space select_statement)*
+      select_clause 
+      (space from_clause)? 
+      (space where_clause)? 
+      (space group_by_clause)? 
+      (space having_clause)? 
+      (space set_operator space select_statement)*
     end
 
     rule select_clause
@@ -15,11 +20,11 @@ module SQLToolkit
     end
 
     rule from_clause
-      space FROM space source_with_joins (comma source_with_joins)*
+      FROM space source_with_joins (comma source_with_joins)*
     end
 
     rule source_with_joins
-       source source_join*
+       source (space source_join)*
     end
 
     rule source
@@ -27,7 +32,7 @@ module SQLToolkit
     end
 
     rule source_join
-      space regular_join_type space source space join_clause
+      regular_join_type space source space join_clause
     end
 
     rule regular_join_type
@@ -72,33 +77,32 @@ module SQLToolkit
       '*' / table '.' '*' / expression alias?
     end
 
-
     rule alias
       space (AS space)? identifier 
     end
 
     rule where_clause
-      space WHERE space expression
+      WHERE space expression
     end
 
     rule group_by_clause
-      space GROUP space BY space expression (comma expression)*
+      GROUP space BY space expression (comma expression)*
     end
 
     rule having_clause
-      space HAVING space expression
+      HAVING space expression
     end
 
     rule order_by_clause
-      space ORDER space BY space order_exression (comma order_exression expression)*
+      ORDER space BY space order_expression (comma order_expression)*
     end
 
     rule limit_clause
-      space LIMIT space integer (space OFFSET space integer)?
+      LIMIT space integer (space OFFSET space integer)?
     end
 
-    rule order_exression
-      expression space ((ASC / DESC) (space NULLS space (FIRST / LAST))?)?
+    rule order_expression
+      expression (space (ASC / DESC) (space NULLS space (FIRST / LAST))?)?
     end
 
     rule expression
@@ -106,7 +110,16 @@ module SQLToolkit
     end
 
     rule single_expression
-      (function_call / column / literal / subquery / '(' space? expression space? ')') (space? '::' space? type)?
+      (case_expression / function_call / column / literal / subquery / '(' space? expression space? ')') 
+      (space? '::' space? type)?
+    end
+
+    rule case_expression
+      CASE space
+        (expression space)? 
+        (WHEN space expression space THEN space expression space)+
+        (ELSE space expression space)? 
+      END
     end
 
     rule type
@@ -114,9 +127,23 @@ module SQLToolkit
     end
 
     rule function_call
-      COUNT '(' space? (DISTINCT space)? ('*'  / expression) space? ')'
-      /
-      unquoted_identifier '(' (space? expression (comma expression)*)? space? ')'
+      (
+        COUNT '(' space? (DISTINCT space)? ('*'  / expression) space? ')'
+        /
+        unquoted_identifier '(' (space? expression (comma expression)*)? space? ')'
+      )
+      (space OVER (space? window_clause / space identifier))?
+    end
+
+    rule window_clause
+      '(' space?
+        (partition_by_clause space)?
+        order_by_clause
+      space? ')'
+    end
+
+    rule partition_by_clause
+      PARTITION space BY space expression (comma expression)*
     end
 
     rule arithmetic_expression
@@ -314,6 +341,38 @@ module SQLToolkit
 
     rule COUNT
       [Cc] [Oo] [Uu] [Nn] [Tt]
+    end
+
+    rule OVER
+      [Oo] [Vv] [Ee] [Rr]
+    end
+
+    rule PARTITION
+      [Pp] [Aa] [Rr] [Tt] [Ii] [Tt] [Ii] [Oo] [Nn]
+    end
+
+    rule WINDOW
+      [Ww] [Ii] [Nn] [Dd] [Oo] [Ww]
+    end
+
+    rule CASE
+      [Cc] [Aa] [Ss] [Ee]
+    end
+
+    rule WHEN
+      [Ww] [Hh] [Ee] [Nn]
+    end
+
+    rule THEN
+      [Tt] [Hh] [Ee] [Nn]
+    end
+
+    rule ELSE
+      [Ee] [Ll] [Ss] [Ee]
+    end
+
+    rule END
+      [Ee] [Nn] [Dd]
     end
 
     rule IS

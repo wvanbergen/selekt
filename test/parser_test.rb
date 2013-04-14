@@ -28,10 +28,6 @@ class ParserTest < Minitest::Unit::TestCase
     assert_parses('select schema.table.*')
     assert_parses('select distinct schema.table.*')
     assert_parses('select min(table)')
-    assert_parses('select count(*)')
-    assert_parses('select count(distinct *)')
-    assert_parses('select count(distinct id)')
-    assert_parses('select count(1) AS number_of_records')
   end
 
   def test_set_operations
@@ -85,6 +81,17 @@ class ParserTest < Minitest::Unit::TestCase
 
   def test_function_calls
     assert_parses('select MIN(column), now(), complicated_stuff(1, 4 + 2)')
+    assert_parses('select count(*)')
+    assert_parses('select count(distinct *)')
+    assert_parses('select count(distinct id)')
+    assert_parses('select count(1)')
+  end
+
+  def test_over_clause
+    assert_parses "SELECT ROW_NUMBER() OVER w AS index"
+    assert_parses "SELECT ROW_NUMBER() OVER (ORDER BY a, b DESC)"
+    assert_parses "SELECT ROW_NUMBER() OVER (PARTITION BY id ORDER BY time)"
+    assert_parses "SELECT ROW_NUMBER() OVER (PARTITION BY id1, id2 ORDER BY time, event_id)"
   end
 
   def test_in_construct
@@ -96,6 +103,13 @@ class ParserTest < Minitest::Unit::TestCase
     assert_parses('select not exist (select 1)')
   end
 
+  def test_case_expression
+    assert_parses 'select CASE column WHEN 1 THEN TRUE WHEN 2 THEN TRUE ELSE FALSE END'
+    assert_parses 'select CASE column WHEN 1 THEN TRUE END'
+    assert_parses 'select CASE WHEN column = 1 THEN TRUE ELSE FALSE END'
+    assert_parses 'select CASE WHEN column <= 10 THEN TRUE WHEN column > 10 THEN FALSE END'
+  end
+
   def test_boolean_operators
     assert_parses('select (a > b AND b > c) OR a IS NULL OR c IS NULL')
     assert_parses('select a >= 10 and b <= 0')
@@ -104,11 +118,18 @@ class ParserTest < Minitest::Unit::TestCase
   def test_where
     assert_parses("select * from t1 where a = 'test' and b >= 10")
     assert_parses('select a where (false)')
-  end  
+  end
 
   def test_group_by_and_having
     assert_parses('select a, b, min(c) min_c group by a, b')
     assert_parses('select a, b, min(c) min_c group by a, b having a >= 10 and min_c')
+  end
+
+  def test_order_by
+    assert_parses('select * from table order by field > 10')
+    assert_parses('select * from table order by field1, field2')
+    assert_parses('select * from table order by field ASC')
+    assert_parses('select * from table order by field DESC NULLS FIRST')
   end
 
   def test_limit_offset
@@ -124,48 +145,6 @@ class ParserTest < Minitest::Unit::TestCase
         from my_first_table,
              my_second_table
       -- EOQ
-    SQL
-  end
-
-  def test_complicated_query
-    assert_parses(<<-SQL)
-
-      SELECT o.total_price_in_usd AS gmv,
-             o.created_at AS gmv_at
-        FROM schema.orders o
-        WHERE o.financial_status IN ('paid', 'authorized')
-          AND o.created_at <= '1998-06-10 15:41:30'::timestamp
-    
-      UNION ALL
-
-      SELECT oo.total_price_in_usd AS gmv,
-             f.gmv_at
-        FROM (SELECT i.order_id,
-                     min(i.created_at) AS gmv_at
-                FROM internal.order_financial_status_transitions i
-               WHERE i.to_state IN ('pending', 'authorized', 'paid')
-               GROUP BY i.order_id) f
-        JOIN warehouse.orders oo ON f.order_id = oo.order_id
-        WHERE oo.created_at > '2003-06-55 15:41:30'::timestamp
-
-      UNION ALL
-
-      SELECT ooo.total_price_in_usd * -1 AS gmv,
-             coalesce(ooo.cancelled_at, re.undo_at) AS gmv_at
-        FROM (SELECT ii.order_id,
-                     min(ii.created_at) AS gmv_at
-                FROM internal.transitions ii
-               WHERE ii.to_state IN ('pending', 'authorized', 'paid')
-               GROUP BY ii.order_id) ff
-        JOIN warehouse.orders ooo ON ff.order_id = ooo.order_id
-        LEFT JOIN (SELECT iii.order_id,
-                          min(iii.created_at) AS undo_at
-                     FROM internal.order_financial_status_transitions iii
-                     WHERE iii.to_state IN ('voided', 'refunded')
-                     GROUP BY iii.order_id
-                  ) re ON ff.order_id = re.order_id
-        WHERE ooo.created_at > '2011-06-22 15:41:30'::timestamp
-          AND coalesce(ooo.cancelled_at, re.undo_at) IS NOT NULL
     SQL
   end
 end
