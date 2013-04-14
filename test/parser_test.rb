@@ -5,7 +5,7 @@ class ParserTest < Minitest::Unit::TestCase
   include SQLToolkit
 
   def test_projections
-    assert parse(%q[select 1, 'test', id, "id"])  
+    assert parse(%q[    select 1, 'test', id, "id"  ])  
     assert parse('select *')
     assert parse('select table.*, other')
     assert parse('select schema.table.*')
@@ -18,14 +18,16 @@ class ParserTest < Minitest::Unit::TestCase
     assert parse('select * from table_1 as "first table", table_2 as "second table"')
   end
 
-  def test_comments
-    assert parse("select 1 -- comment\n")
-    assert parse("select -- comment\n-- more comments \n 1")
+  def test_joins
+    assert parse('select * from table t1 join table t2 on t1.a = t2.a')
     assert parse(<<-SQL)
-      select 1,2,3,4 -- ... and so on
-        from my_first_table,
-             my_second_table
-      -- EOQ
+      SELECT *
+        FROM table1 AS t1
+        JOIN table2 AS t2 on t1.id = t2.id
+        INNER JOIN (
+          SELECT 1 AS id
+        ) t3 ON t3.id = t1.id
+        LEFT JOIN table4 t4 on t1.id = t4.id AND NOT t1.fraud
     SQL
   end
 
@@ -84,4 +86,15 @@ class ParserTest < Minitest::Unit::TestCase
     assert parse('select * from table limit 10')
     assert parse('select * from table limit 10 offset 50')
   end
+
+  def test_comments
+    assert parse("select 1 -- comment\n")
+    assert parse("select -- comment\n-- more comments \n 1")
+    assert parse(<<-SQL)
+      select 1,2,3,4 -- ... and so on
+        from my_first_table,
+             my_second_table
+      -- EOQ
+    SQL
+  end  
 end

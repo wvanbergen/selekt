@@ -19,15 +19,23 @@ module SQLToolkit
     end
 
     rule from
-      space from_clause
-    end
-
-    rule from_clause
-      "from" space source (space? ',' space? source)*
+      space "from" space source (space? ',' space? source)*
     end
 
     rule source
+       single_source join*
+    end
+
+    rule single_source
       table alias? / subquery alias
+    end
+
+    rule join
+      space regular_join_type space single_source space 'on' space boolean_expression
+    end
+
+    rule regular_join_type
+      (('inner' / 'left' / 'right' / 'full' space 'outer') space)? 'join'
     end
 
     rule subquery
@@ -44,6 +52,14 @@ module SQLToolkit
 
     rule schema
       identifier
+    end
+
+    rule column
+      table_column / identifier
+    end
+
+    rule table_column
+      identifier '.' identifier
     end
 
     rule alias
@@ -79,7 +95,7 @@ module SQLToolkit
     end
 
     rule single_expression
-      (function_call / identifier / literal / subquery / '(' space? expression space? ')') (space? '::' space? type)?
+      (function_call / column / literal / subquery / '(' space? expression space? ')') (space? '::' space? type)?
     end
 
     rule type
