@@ -88,10 +88,10 @@ class ParserTest < Minitest::Unit::TestCase
   end
 
   def test_over_clause
-    assert_parses "SELECT ROW_NUMBER() OVER w AS index"
     assert_parses "SELECT ROW_NUMBER() OVER (ORDER BY a, b DESC)"
     assert_parses "SELECT ROW_NUMBER() OVER (PARTITION BY id ORDER BY time)"
     assert_parses "SELECT ROW_NUMBER() OVER (PARTITION BY id1, id2 ORDER BY time, event_id)"
+    assert_parses "SELECT ROW_NUMBER() OVER w AS index WINDOW w AS (ORDER BY timestamp)"
   end
 
   def test_in_construct

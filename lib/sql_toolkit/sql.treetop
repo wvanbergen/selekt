@@ -12,6 +12,7 @@ module SQLToolkit
       (space where_clause)? 
       (space group_by_clause)? 
       (space having_clause)? 
+      (space named_window_clause)?
       (space set_operator space select_statement)*
     end
 
@@ -140,6 +141,10 @@ module SQLToolkit
         (partition_by_clause space)?
         order_by_clause
       space? ')'
+    end
+
+    rule named_window_clause
+      WINDOW space identifier space AS space? window_clause
     end
 
     rule partition_by_clause
