@@ -3,8 +3,8 @@ require 'test_helper'
 class ParserTest < Minitest::Unit::TestCase
 
   def assert_parses(sql)
-    ast = SQLToolkit.parse(sql) rescue nil
-    assert_instance_of Treetop::Runtime::SyntaxNode, ast, "Expected the provided string to parse as valid SQL"
+    q = SQLToolkit.parse(sql) rescue nil
+    assert_instance_of SQLToolkit::Query, q, "Expected the provided string to parse as valid SQL"
   end
 
   def test_basic_syntax_flexibility
