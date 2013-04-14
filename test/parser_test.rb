@@ -17,6 +17,11 @@ class ParserTest < Minitest::Unit::TestCase
     assert parse('select count(1) AS number_of_records')
   end
 
+  def test_set_operations
+    assert "select * from t1 union select * from t2"
+    assert "select * from t1 union all select * from t2 union all select * from t3"
+  end
+
   def test_sources
     assert parse('select * from t1')
     assert parse('select * from table1 "t1"')

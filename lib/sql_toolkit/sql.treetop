@@ -3,11 +3,11 @@ module SQLToolkit
   grammar SQL
 
     rule sql_query
-      space? select_statement space?
+      space? select_statement order_by? limit? space?
     end
 
     rule select_statement
-      select from? where? group_by? having? order_by? limit?
+      select from? where? group_by? having? (space set_operator space select_statement)*
     end
 
     rule select
@@ -156,6 +156,10 @@ module SQLToolkit
 
     rule boolean_operator
       'and' / 'or'
+    end
+
+    rule set_operator
+      'union' (space 'all')?
     end
 
     rule space
