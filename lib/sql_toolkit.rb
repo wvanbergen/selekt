@@ -17,7 +17,7 @@ module SQLToolkit
   end
 
   def parse(sql)
-    parser.parse(sql.downcase) or raise "Could not parse SQL query"
+    parser.parse(sql) or raise "Could not parse SQL query"
   end
 
   def used_relations(sql)

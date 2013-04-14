@@ -3,41 +3,41 @@ module SQLToolkit
   grammar SQL
 
     rule sql_query
-      space? select_statement order_by? limit? space?
+      space? select_statement order_by_clause? limit_clause? space?
     end
 
     rule select_statement
-      select from? where? group_by? having? (space set_operator space select_statement)*
+      select_clause from_clause? where_clause? group_by_clause? having_clause? (space set_operator space select_statement)*
     end
 
-    rule select
-      "select" space ("distinct" space)? projection (',' space? projection)*
+    rule select_clause
+      SELECT space (DISTINCT space)? projection (',' space? projection)*
     end
 
-    rule from
-      space "from" space source_with_joins (space? ',' space? source_with_joins)*
+    rule from_clause
+      space FROM space source_with_joins (space? ',' space? source_with_joins)*
     end
 
     rule source_with_joins
-       source join*
+       source source_join*
     end
 
     rule source
       ((table <TableReference>) (alias <Alias>)? / subquery (alias <Alias>)) <Source>
     end
 
-    rule join
+    rule source_join
       space regular_join_type space source space join_clause
     end
 
     rule regular_join_type
-      (('inner' / 'left' / 'right' / 'full' space 'outer') space)? 'join'
+      ((INNER / LEFT / RIGHT / FULL space OUTER) space)? JOIN
     end
 
     rule join_clause
-      'on' space boolean_expression
+      ON space boolean_expression
       /
-      'using' space? '(' space? identifier (space? ',' space? identifier)* ')'
+      USING space? '(' space? identifier (space? ',' space? identifier)* ')'
     end
 
     rule subquery
@@ -69,37 +69,37 @@ module SQLToolkit
     end
 
     rule aggregate_function_call
-    'count' '(' space? ('distinct' space)? ('*'  / expression) space? ')'
+      COUNT '(' space? (DISTINCT space)? ('*'  / expression) space? ')'
       /
       function_call
     end    
 
     rule alias
-      space ('as' space)? identifier 
+      space (AS space)? identifier 
     end
 
-    rule where
-      space 'where' space expression
+    rule where_clause
+      space WHERE space expression
     end
 
-    rule group_by
-      space 'group' space 'by' space expression (space? ',' space? expression)*
+    rule group_by_clause
+      space GROUP space BY space expression (space? ',' space? expression)*
     end
 
-    rule having
-      space 'having' space expression
+    rule having_clause
+      space HAVING space expression
     end
 
-    rule order_by
-      space 'order' space 'by' space order_exression (space? ',' order_exression expression)*
+    rule order_by_clause
+      space ORDER space BY space order_exression (space? ',' order_exression expression)*
     end
 
-    rule limit
-      space 'limit' space integer (space 'offset' space integer)?
+    rule limit_clause
+      space LIMIT space integer (space OFFSET space integer)?
     end
 
     rule order_exression
-      expression space ('asc' / 'desc' (space 'nulls' space ('first' / 'last'))?)?
+      expression space ((ASC / DESC) (space NULLS space (FIRST / LAST))?)?
     end
 
     rule expression
@@ -127,11 +127,11 @@ module SQLToolkit
     end
 
     rule comparison_expression
-      'exist' space? subquery
+      EXIST space? subquery
       /
-      arithmetic_expression space 'is' (space 'not')? space boolean
+      arithmetic_expression space IS (space NOT)? space boolean
       /
-      arithmetic_expression space ('not' space)? 'in' space list_of_values
+      arithmetic_expression space (NOT space)? IN space list_of_values
       /
       arithmetic_expression (space? comparison_operator space? arithmetic_expression)?
     end
@@ -147,7 +147,7 @@ module SQLToolkit
     end
 
     rule negatable_expression
-      ('not' space)? comparison_expression
+      (NOT space)? comparison_expression
     end
 
     rule boolean_expression
@@ -155,11 +155,11 @@ module SQLToolkit
     end
 
     rule boolean_operator
-      'and' / 'or'
+      AND / OR
     end
 
     rule set_operator
-      'union' (space 'all')?
+      UNION (space ALL)?
     end
 
     rule space
@@ -196,19 +196,7 @@ module SQLToolkit
     end
 
     rule boolean
-      true / false / null
-    end
-
-    rule true
-      'true'
-    end
-
-    rule false
-      'false'
-    end
-
-    rule null
-      'null'
+      TRUE / FALSE / NULL
     end
 
     rule integer
@@ -217,6 +205,150 @@ module SQLToolkit
 
     rule float
       "-"? [0-9]* '.' [0-9]+
+    end
+
+    rule SELECT
+      [Ss] [Ee] [Ll] [Ee] [Cc] [Tt]      
+    end
+
+    rule DISTINCT
+      [Dd] [Ii] [Ss] [Tt] [Ii] [Nn] [Cc] [Tt]
+    end
+
+    rule FROM
+      [Ff] [Rr] [Oo] [Mm]
+    end
+
+    rule HAVING
+      [Hh] [Aa] [Vv] [Ii] [Nn] [Gg]
+    end
+
+    rule ORDER
+      [Oo] [Rr] [Dd] [Ee] [Rr]
+    end
+
+    rule ASC
+      [Aa] [Ss] [Cc]
+    end
+
+    rule DESC
+      [Dd] [Ee] [Ss] [Cc]
+    end
+
+    rule NULLS
+      [Nn] [Uu] [Ll] [Ll] [Ss]
+    end
+
+    rule FIRST
+      [Ff] [Ii] [Rr] [Ss] [Tt]
+    end
+
+    rule LAST
+      [Ll] [Aa] [Ss] [Tt]
+    end
+
+    rule AS
+      [Aa] [Ss]
+    end
+
+    rule JOIN
+      [Jj] [Oo] [Ii] [Nn]
+    end
+
+    rule FULL
+      [Ff] [Uu] [Ll] [Ll]
+    end
+
+    rule OUTER
+      [Oo] [Uu] [Tt] [Ee] [Rr]
+    end
+
+    rule INNER
+      [Ii] [Nn] [Nn] [Ee] [Rr]
+    end
+
+    rule LEFT
+      [Ll] [Ee] [Ff] [Tt]
+    end
+
+    rule RIGHT
+      [Rr] [Ii] [Gg] [Hh] [Tt]
+    end
+
+    rule ON
+      [Oo] [Nn]
+    end
+
+    rule USING
+      [Uu] [Ss] [Ii] [Nn] [Gg]
+    end
+
+    rule WHERE
+      [Ww] [Hh] [Ee] [Rr] [Ee]
+    end
+
+    rule GROUP
+      [Gg] [Rr] [Oo] [Uu] [Pp]
+    end
+
+    rule BY
+      [Bb] [Yy]
+    end
+
+    rule LIMIT
+      [Ll] [Ii] [Mm] [Ii] [Tt]
+    end
+
+    rule OFFSET
+      [Oo] [Ff] [Ff] [Ss] [Ee] [Tt]
+    end
+
+    rule UNION
+      [Uu] [Nn] [Ii] [Oo] [Nn]
+    end
+
+    rule ALL
+      [Aa] [Ll] [Ll]
+    end
+
+    rule COUNT
+      [Cc] [Oo] [Uu] [Nn] [Tt]
+    end
+
+    rule IS
+      [Ii] [Ss]
+    end
+
+    rule IN
+      [Ii] [Nn]
+    end
+
+    rule EXIST
+      [Ee] [Xx] [Ii] [Ss] [Tt]
+    end
+
+    rule NOT
+      [Nn] [Oo] [Tt]
+    end
+
+    rule AND
+      [Aa] [Nn] [Dd]
+    end
+
+    rule OR
+      [Oo] [Rr]
+    end    
+
+    rule TRUE
+      [Tt] [Rr] [Uu] [Ee]
+    end
+
+    rule FALSE
+      [Ff] [Aa] [Ll] [Ss] [Ee]
+    end
+
+    rule NULL
+      [Nn] [Uu] [Ll] [Ll]
     end
   end
 end
