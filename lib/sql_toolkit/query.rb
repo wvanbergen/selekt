@@ -28,8 +28,13 @@ class SQLToolkit::Query
     sources.map(&:variable_name).uniq
   end
 
-  def stub(source_name, stubbed_query)
-    render_stubbed_sql(ast, source_name, stubbed_query)
+  def stub(source_name, source_stub)
+    stub_sql = source_stub.respond_to?(:sql) ? source_stub.sql : source_stub.to_s
+    self.class.new(render_stubbed_sql(ast, source_name.to_s, stub_sql))
+  end
+
+  def sql
+    ast.input
   end
 
   protected

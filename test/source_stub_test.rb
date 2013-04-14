@@ -15,9 +15,9 @@ class SourceStubTest < Minitest::Unit::TestCase
   def test_sql_generation
     ss = SQLToolkit::SourceStub.new(:a, :b)
     ss.add_row [nil, 2]
-    assert_equal "SELECT NULL AS a, 2 AS b", ss.to_sql
+    assert_equal "SELECT NULL AS a, 2 AS b", ss.sql
     ss.add_row ['test', 10]
     ss.add_row ['test2', 123]
-    assert_equal "SELECT NULL AS a, 2 AS b\nUNION ALL\nSELECT 'test', 10\nUNION ALL\nSELECT 'test2', 123", ss.to_sql
+    assert_equal "SELECT NULL AS a, 2 AS b\nUNION ALL\nSELECT 'test', 10\nUNION ALL\nSELECT 'test2', 123", ss.sql
   end
 end

@@ -4,7 +4,7 @@ module SQLToolkit
   extend self
 
   RESERVED_SQL_KEYWORDS = [
-    'select', 'from', 'where', 'group', 'order', 'having', 
+    'select', 'from', 'where', 'group', 'order', 'having', 'union', 'all',
     'limit', 'offset', 'as', 'by', 'with', 'distinct',
     'left', 'right', 'inner', 'full', 'outer', 'join', 'on', 'using', 'natural',
     'case', 'when', 'then', 'else', 'end',

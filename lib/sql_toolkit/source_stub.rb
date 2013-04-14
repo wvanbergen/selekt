@@ -12,7 +12,9 @@ class SQLToolkit::SourceStub
     @rows << row
   end
 
-  def to_sql
+  alias_method :<<, :add_row
+
+  def sql
     first_row_sql = [row_sql_with_names(rows[0])]
     other_row_sql = rows[1..-1].map { |row| row_sql_without_names(row) }
     [first_row_sql].concat(other_row_sql).join("\nUNION ALL\n")

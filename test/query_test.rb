@@ -2,6 +2,11 @@ require 'test_helper'
 
 class QueryTest < Minitest::Unit::TestCase
 
+  def test_sql_roundtrip
+    query = 'select * from table'
+    assert_equal query, SQLToolkit.parse(query).sql
+  end
+
   def test_sources
     source_names = SQLToolkit.parse(<<-SQL).source_names
       SELECT *
@@ -16,7 +21,14 @@ class QueryTest < Minitest::Unit::TestCase
 
   def test_stubbing_sources
     query = SQLToolkit.parse('select * from t1')
-    assert_equal "select * from (select 1) AS t1", query.stub('t1', 'select 1')
+    assert_equal "select * from (select 1) AS t1", query.stub('t1', 'select 1').sql
+
+    t1_stub = SQLToolkit::SourceStub.new(:field_1, :field_2)
+    t1_stub << ['test', 123]
+    t1_stub << ['test', 456]
+    t1_stub << ['test', 789]
+
+    assert_equal query.stub(:t1, t1_stub).sql, "select * from (SELECT 'test' AS field_1, 123 AS field_2\nUNION ALL\nSELECT 'test', 456\nUNION ALL\nSELECT 'test', 789) AS t1"
   end
 
   def test_relations

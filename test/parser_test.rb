@@ -59,6 +59,13 @@ class ParserTest < Minitest::Unit::TestCase
   def test_subquery
     assert_parses('select a from (select b) as b_alias')
     assert_parses('select a from ( select b from (select c) as c_alias ) as b_alias')
+    assert_parses <<-SQL
+      select * from (SELECT 'test' AS field_1, 123 AS field_2
+      UNION ALL
+      SELECT 'test', 456
+      UNION ALL
+      SELECT 'test', 789) AS t1
+    SQL
   end
 
   def test_arithmetic_operators
