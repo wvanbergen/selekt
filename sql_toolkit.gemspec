@@ -22,5 +22,4 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency('pg')
 
   gem.add_runtime_dependency('treetop')
-  gem.add_runtime_dependency('polyglot')
 end

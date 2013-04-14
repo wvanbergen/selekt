@@ -108,5 +108,47 @@ class ParserTest < Minitest::Unit::TestCase
              my_second_table
       -- EOQ
     SQL
-  end  
+  end
+
+  def test_complicated_query
+    assert parse(<<-SQL)
+
+      SELECT o.total_price_in_usd AS gmv,
+             o.created_at AS gmv_at
+        FROM schema.orders o
+        WHERE o.financial_status IN ('paid', 'authorized')
+          AND o.created_at <= '1998-06-10 15:41:30'::timestamp
+    
+      UNION ALL
+
+      SELECT oo.total_price_in_usd AS gmv,
+             f.gmv_at
+        FROM (SELECT i.order_id,
+                     min(i.created_at) AS gmv_at
+                FROM internal.order_financial_status_transitions i
+               WHERE i.to_state IN ('pending', 'authorized', 'paid')
+               GROUP BY i.order_id) f
+        JOIN warehouse.orders oo ON f.order_id = oo.order_id
+        WHERE oo.created_at > '2003-06-55 15:41:30'::timestamp
+
+      UNION ALL
+
+      SELECT ooo.total_price_in_usd * -1 AS gmv,
+             coalesce(ooo.cancelled_at, re.undo_at) AS gmv_at
+        FROM (SELECT ii.order_id,
+                     min(ii.created_at) AS gmv_at
+                FROM internal.transitions ii
+               WHERE ii.to_state IN ('pending', 'authorized', 'paid')
+               GROUP BY ii.order_id) ff
+        JOIN warehouse.orders ooo ON ff.order_id = ooo.order_id
+        LEFT JOIN (SELECT iii.order_id,
+                          min(iii.created_at) AS undo_at
+                     FROM internal.order_financial_status_transitions iii
+                     WHERE iii.to_state IN ('voided', 'refunded')
+                     GROUP BY iii.order_id
+                  ) re ON ff.order_id = re.order_id
+        WHERE ooo.created_at > '2011-06-22 15:41:30'::timestamp
+          AND coalesce(ooo.cancelled_at, re.undo_at) IS NOT NULL
+    SQL
+  end
 end
