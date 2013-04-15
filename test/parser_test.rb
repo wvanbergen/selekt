@@ -117,6 +117,11 @@ class ParserTest < Minitest::Unit::TestCase
     assert_parses 'select CASE WHEN column <= 10 THEN TRUE WHEN column > 10 THEN FALSE END'
   end
 
+  def test_interval_expression
+    assert_parses "select NOW() + interval '10 day'"
+    assert_parses "select NOW() + interval column"
+  end
+
   def test_boolean_operators
     assert_parses('select (a > b AND b > c) OR a IS NULL OR c IS NULL')
     assert_parses('select a >= 10 and b <= 0')

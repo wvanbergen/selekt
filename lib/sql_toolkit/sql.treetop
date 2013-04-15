@@ -131,7 +131,7 @@ module SQLToolkit
     end
 
     rule single_expression
-      (case_expression / function_call / column / literal / subquery / '(' space? expression space? ')') 
+      (interval_expression / case_expression / function_call / column / literal / subquery / '(' space? expression space? ')') 
       (space? '::' space? type)?
     end
 
@@ -141,6 +141,10 @@ module SQLToolkit
         (WHEN space expression space THEN space expression space)+
         (ELSE space expression space)? 
       END
+    end
+
+    rule interval_expression
+      INTERVAL space expression
     end
 
     rule type
@@ -410,6 +414,10 @@ module SQLToolkit
 
     rule END
       [Ee] [Nn] [Dd]
+    end
+
+    rule INTERVAL
+      [Ii] [Nn] [Tt] [Ee] [Rr] [Vv] [Aa] [Ll]
     end
 
     rule IS

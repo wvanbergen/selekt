@@ -7,7 +7,7 @@ module SQLToolkit
     'select', 'from', 'where', 'group', 'order', 'having', 'union', 'all',
     'limit', 'offset', 'as', 'by', 'with', 'distinct',
     'left', 'right', 'inner', 'full', 'outer', 'join', 'on', 'using', 'natural',
-    'case', 'when', 'then', 'else', 'end',
+    'case', 'when', 'then', 'else', 'end', 'interval',
     'over', 'partition', 'range', 'rows', 'window'
   ]
 
