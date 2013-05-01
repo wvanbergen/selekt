@@ -36,6 +36,8 @@ module SQLToolkit
       when FalseClass; 'FALSE'
       when Numeric; val.to_s
       when String; "'" + val.gsub("'", "''") + "'"
+      when DateTime; quote(val.strftime('%F %X')) + '::timestamp'
+      when Date; quote(val.strftime('%F')) + '::timestamp'
       else raise "Don't know how to quote #{val.inspect}!"
     end
   end
