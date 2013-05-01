@@ -3,16 +3,22 @@ class SQLToolkit::SourceStub
   attr_reader :fields, :rows
 
   def initialize(*fields)
-    @fields = fields
+    @fields = fields.map { |f| f.to_sym }
     @rows = []
   end
 
   def add_row(row)
-    raise SQLToolkit::StubError, "Row should have #{fields.size} values" if fields.size != row.size
-    @rows << row
+    if row.is_a?(Hash)
+      @rows << fields.map { |f| row[f] }
+    else
+      raise SQLToolkit::StubError, "Row should have #{fields.size} values maximum" if fields.size < row.size
+      @rows << row
+    end
+    return self
   end
 
   alias_method :<<, :add_row
+  alias_method :push, :add_row  
 
   def sql
     first_row_sql = [row_sql_with_names(rows[0])]
@@ -24,19 +30,24 @@ class SQLToolkit::SourceStub
     @rows.size
   end
 
+  def ==(other)
+    return false unless other.is_a?(SQLToolkit::SourceStub)
+    fields == other.fields && rows == other.rows
+  end
+
   alias_method :length, :size
 
   protected
 
   def row_sql_with_names(row)
-    'SELECT ' + row.map.with_index do |value, index|
-      "#{SQLToolkit.quote(value)} AS #{SQLToolkit.safe_identifier(fields[index].to_s)}"
+    'SELECT ' + fields.map.with_index do |field, index|
+      "#{SQLToolkit.quote(row[index])} AS #{SQLToolkit.safe_identifier(field.to_s)}"
     end.join(', ')
   end
 
   def row_sql_without_names(row)
-    'SELECT ' + row.map do |value|
-      SQLToolkit.quote(value)
+    'SELECT ' + fields.map.with_index do |field, index|
+      SQLToolkit.quote(row[index])
     end.join(', ')
   end
 end
