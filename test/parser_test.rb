@@ -106,8 +106,8 @@ class ParserTest < Minitest::Unit::TestCase
   end
 
   def test_exist_construct
-    assert_parses('select exist(select 1)')
-    assert_parses('select not exist (select 1)')
+    assert_parses('select exists (select 1)')
+    assert_parses('select not exists (select 1)')
   end
 
   def test_case_expression

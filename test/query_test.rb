@@ -12,7 +12,7 @@ class QueryTest < Minitest::Unit::TestCase
       SELECT *
         FROM schema.table1
         LEFT JOIN table2 t2 ON t1.id = t2.id
-        WHERE EXIST (SELECT 1 FROM table3 WHERE value > t1.value)
+        WHERE EXISTS (SELECT 1 FROM table3 WHERE value > t1.value)
           AND t1.id NOT IN (SELECT table1_id FROM table3 t3)
     SQL
 
@@ -42,7 +42,6 @@ class QueryTest < Minitest::Unit::TestCase
       SELECT *
         FROM schema."table1" t1
         LEFT JOIN table2 t2 ON t1.id = t2.id
-        WHERE EXIST (SELECT 1 FROM table3 WHERE value > t1.value)
           AND t1.id NOT IN (SELECT table1_id FROM table3)
 
       UNION

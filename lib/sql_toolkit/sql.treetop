@@ -184,7 +184,7 @@ module SQLToolkit
     end
 
     rule comparison_expression
-      EXIST space? subquery
+      EXISTS space? subquery
       /
       arithmetic_expression space IS (space NOT)? space boolean
       /
@@ -428,8 +428,8 @@ module SQLToolkit
       [Ii] [Nn]
     end
 
-    rule EXIST
-      [Ee] [Xx] [Ii] [Ss] [Tt]
+    rule EXISTS
+      [Ee] [Xx] [Ii] [Ss] [Tt] [Ss]
     end
 
     rule NOT
