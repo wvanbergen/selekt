@@ -12,13 +12,20 @@ class SQLToolkit::SourceStub
       @rows << fields.map { |f| row[f] }
     else
       raise SQLToolkit::StubError, "Row should have #{fields.size} values maximum" if fields.size < row.size
-      @rows << row
+      @rows << fields.map.with_index { |_, i| row[i] }
     end
     return self
   end
 
   alias_method :<<, :add_row
   alias_method :push, :add_row  
+
+  def add_rows(rows)
+    rows.each { |row| add_row(row) }
+    return self
+  end
+
+  alias_method :concat, :add_rows
 
   def sql
     first_row_sql = [row_sql_with_names(rows[0])]

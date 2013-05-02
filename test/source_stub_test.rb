@@ -34,6 +34,17 @@ class SourceStubTest < Minitest::Unit::TestCase
     assert_equal s1, s2
   end  
 
+  def test_add_rows
+    s1 = SQLToolkit::SourceStub.new(:a, :b)
+    s1.add_rows([
+      [1],
+      { b: 2 }
+    ])
+
+    assert_equal [1, nil], s1.rows[0]
+    assert_equal [nil, 2], s1.rows[1]
+  end
+
   def test_sql_generation
     ss = SQLToolkit::SourceStub.new(:a, :b)
     ss.add_row [nil, 2]
