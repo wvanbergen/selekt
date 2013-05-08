@@ -53,4 +53,10 @@ class SourceStubTest < Minitest::Unit::TestCase
     ss.add_row ['test2', 123]
     assert_equal "SELECT NULL AS a, 2 AS b\nUNION ALL\nSELECT 'test', 10\nUNION ALL\nSELECT 'test2', 123", ss.sql
   end
+
+  def test_value_quoting_for_sql
+    ss = SQLToolkit::SourceStub.new(:a, :b, :c)
+    ss.add_row [DateTime.parse('2012-01-03 12:44:33'), Date.parse('2012-01-01'), "'"]
+    assert_equal "SELECT '2012-01-03 12:44:33'::timestamp AS a, '2012-01-01'::date AS b, '''' AS c", ss.sql
+  end
 end
