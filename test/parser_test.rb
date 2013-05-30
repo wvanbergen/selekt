@@ -37,6 +37,7 @@ class ParserTest < Minitest::Unit::TestCase
 
   def test_sources
     assert_parses('select * from t1')
+    assert_parses('select * from (t1)')
     assert_parses('select * from table1 "t1"')
     assert_parses('select * from schema.table1 as t1')
     assert_parses('select * from table_1 as "first table", table_2 as "second table"')
@@ -44,6 +45,7 @@ class ParserTest < Minitest::Unit::TestCase
 
   def test_joins
     assert_parses('select * from table t1 join table t2 on t1.a = t2.a')
+    assert_parses('select * from (table t1 join table t2 on t1.a = t2.a)')
     assert_parses('select * from t1 full outer join t2 using (country, state)')
     assert_parses(<<-SQL)
       SELECT *

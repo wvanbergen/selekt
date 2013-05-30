@@ -22,10 +22,14 @@ module SQLToolkit
 
     rule from_clause
       FROM space source_with_joins (comma source_with_joins)*
+      /
+      FROM space source_with_joins (comma source_with_joins)*
     end
 
     rule source_with_joins
        source (space source_join)*
+       /
+       '(' source (space source_join)* ')'
     end
 
     rule source
