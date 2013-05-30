@@ -13,7 +13,7 @@ class SQLToolkit::Query
   attr_reader :ast
 
   def initialize(sql)
-    @ast = SQLToolkit.parser.parse(sql) or raise SQLToolkit::ParseError.new("Could not parse SQL query")
+    @ast = SQLToolkit.parser.parse(sql) or raise SQLToolkit::ParseError.new("Could not parse SQL query: #{sql}")
   end
 
   def relations

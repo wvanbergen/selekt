@@ -1,4 +1,5 @@
 require "treetop"
+require "date"
 
 module SQLToolkit
   extend self
