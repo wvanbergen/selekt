@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ParserTest < Minitest::Unit::TestCase
+class ParserTest < Minitest::Test
 
   def assert_parses(sql)
     q = SQLToolkit.parse(sql) rescue nil
@@ -125,7 +125,7 @@ class ParserTest < Minitest::Unit::TestCase
   end
 
   def test_boolean_operators
-    assert_parses('select (a > b AND b > c) OR a IS NULL OR c IS NULL')
+    assert_parses('select (a > b AND b ilike c) OR a IS NULL OR c IS NULL')
     assert_parses('select a >= 10 and b <= 0')
   end
 

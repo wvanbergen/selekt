@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SQLToolkitTest < Minitest::Unit::TestCase
+class SQLToolkitTest < Minitest::Test
 
   def test_safe_identifier
     assert_equal 'test', SQLToolkit.safe_identifier('test')

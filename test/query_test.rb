@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class QueryTest < Minitest::Unit::TestCase
+class QueryTest < Minitest::Test
 
   def test_sql_roundtrip
     query = 'select * from table'

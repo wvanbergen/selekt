@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SourceStubTest < Minitest::Unit::TestCase
+class SourceStubTest < Minitest::Test
 
   def test_row_size_check
     ss = SQLToolkit::SourceStub.new(:a, :b)
