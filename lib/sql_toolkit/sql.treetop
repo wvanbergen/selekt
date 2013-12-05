@@ -204,7 +204,7 @@ module SQLToolkit
     end
 
     rule comparison_operator
-      '<=' / '>=' / '<>' / '>' / '<' / '!=' / '='
+      '<=' / '>=' / '<>' / '>' / '<' / '!=' / '=' / LIKE / ILIKE
     end
 
     rule negatable_expression
@@ -458,6 +458,14 @@ module SQLToolkit
 
     rule NULL
       [Nn] [Uu] [Ll] [Ll]
+    end
+
+    rule LIKE
+      [Ll] [Ii] [Kk] [Ee]
+    end
+
+    rule ILIKE
+      [Ii] [Ll] [Ii] [Kk] [Ee]
     end
   end
 end
