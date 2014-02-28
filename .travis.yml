@@ -6,7 +6,6 @@ rvm:
   - 2.1.1
   - ruby-head
   - rbx
-  - jruby-18mode
   - jruby-19mode
 matrix:
   allow_failures:
