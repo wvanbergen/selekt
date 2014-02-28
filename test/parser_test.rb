@@ -31,8 +31,8 @@ class ParserTest < Minitest::Test
   end
 
   def test_set_operations
-    assert "select * from t1 union select * from t2"
-    assert "select * from t1 union all select * from t2 union all select * from t3"
+    assert_parses "select * from t1 union select * from t2"
+    assert_parses "select * from t1 union all select * from t2 union all select * from t3"
   end
 
   def test_sources
