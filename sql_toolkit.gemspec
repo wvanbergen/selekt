@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.version       = SQLToolkit::VERSION
   gem.authors       = ["Willem van Bergen"]
   gem.email         = ["willem@railsdoctors.com"]
-  gem.description   = %q{A toolkit to work with the SQL language. Incluses a parser, and tools mor testing and monitoring}
+  gem.description   = %q{A toolkit to work with the SQL language. Incluses a SQL parser, tree manipulations, and tools for testing and monitoring}
   gem.summary       = %q{Toolkit to work with SQL queries}
   gem.homepage      = "https://github.com/wvanbergen/sql_toolkit"
 
@@ -19,7 +19,6 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency('rake')
   gem.add_development_dependency('minitest', '~> 5')
-  gem.add_development_dependency('pg')
 
   gem.add_runtime_dependency('treetop')
 end
