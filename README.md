@@ -27,7 +27,7 @@ And run `bundle install`.
 
 ## Usage
 
-Testing a query using a stub:
+Testing a complex query using stubs:
 
 ``` ruby
 # Say we have this view definition, to get a list of your customers
@@ -64,11 +64,20 @@ assert_equal true, result.rows[0][:active]
 # Now let's try it with a sale that should not be counted.
 old_sale = SQLToolkit::SourceStub.new(:sale_id, :customer_id, :timestamp)
 old_sale << [1, 1, Time.now - 2.months]
-stubbed_query = query.stub('c', customers).stub('s', single_sale)
+stubbed_query = query.stub('c', customers).stub('s', old_sale)
 
 result = db.query(stubbed_query.sql)
 assert_equal 1, result.rows.length
 assert_equal false, result.rows[0][:active]
+
+# Finally, let's try it with an unrelated sale
+no_sale = SQLToolkit::SourceStub.new(:sale_id, :customer_id, :timestamp)
+no_sale << [1, 2, Time.now] # use a different customer_id
+stubbed_query = query.stub('c', customers).stub('s', no_sale)
+
+result = db.query(stubbed_query.sql)
+assert_equal 1, result.rows.length 
+assert_equal false, result.rows[0][:active] # is this going to pass?
 ```
 
 This way, you can easily quickly test the behavior of your SQL queries, with
