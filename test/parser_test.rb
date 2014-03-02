@@ -3,8 +3,8 @@ require 'test_helper'
 class ParserTest < Minitest::Test
 
   def assert_parses(sql)
-    q = SQLToolkit.parse(sql) rescue nil
-    assert_instance_of SQLToolkit::Query, q, "Expected the provided string to parse as valid SQL"
+    q = Selekt.parse(sql) rescue nil
+    assert_instance_of Selekt::Query, q, "Expected the provided string to parse as valid SQL"
   end
 
   def test_basic_syntax_flexibility
@@ -80,7 +80,7 @@ class ParserTest < Minitest::Test
     assert_parses('select 1 > 2')
     assert_parses('select 1 + 2 > 2')
     assert_parses('select a > b')
-    assert_raises(SQLToolkit::ParseError) { SQLToolkit.parse('select 1 > 2 > 3') }
+    assert_raises(Selekt::ParseError) { Selekt.parse('select 1 > 2 > 3') }
   end
 
   def test_boolean_tests

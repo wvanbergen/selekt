@@ -1,7 +1,7 @@
 require "treetop"
 require "date"
 
-module SQLToolkit
+module Selekt
   extend self
 
   RESERVED_SQL_KEYWORDS = [
@@ -17,13 +17,13 @@ module SQLToolkit
 
   def parser
     @parser ||= begin
-      Treetop.load(File.expand_path('./sql_toolkit/sql.treetop', File.dirname(__FILE__)))
-      SQLToolkit::SQLParser.new
+      Treetop.load(File.expand_path('./selekt/sql.treetop', File.dirname(__FILE__)))
+      Selekt::SQLParser.new
     end
   end
 
   def parse(sql)
-    SQLToolkit::Query.new(sql)    
+    Selekt::Query.new(sql)    
   end
 
   def safe_identifier(id)
@@ -44,7 +44,7 @@ module SQLToolkit
   end
 end
 
-require "sql_toolkit/version"
-require "sql_toolkit/sql"
-require "sql_toolkit/query"
-require "sql_toolkit/source_stub"
+require "selekt/version"
+require "selekt/sql"
+require "selekt/query"
+require "selekt/source_stub"

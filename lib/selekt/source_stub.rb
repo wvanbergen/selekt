@@ -1,4 +1,4 @@
-class SQLToolkit::SourceStub
+class Selekt::SourceStub
 
   attr_reader :fields, :rows
 
@@ -11,7 +11,7 @@ class SQLToolkit::SourceStub
     if row.is_a?(Hash)
       @rows << fields.map { |f| row[f] }
     else
-      raise SQLToolkit::StubError, "Row should have #{fields.size} values maximum" if fields.size < row.size
+      raise Selekt::StubError, "Row should have #{fields.size} values maximum" if fields.size < row.size
       @rows << fields.map.with_index { |_, i| row[i] }
     end
     return self
@@ -38,7 +38,7 @@ class SQLToolkit::SourceStub
   end
 
   def ==(other)
-    return false unless other.is_a?(SQLToolkit::SourceStub)
+    return false unless other.is_a?(Selekt::SourceStub)
     fields == other.fields && rows == other.rows
   end
 
@@ -48,13 +48,13 @@ class SQLToolkit::SourceStub
 
   def row_sql_with_names(row)
     'SELECT ' + fields.map.with_index do |field, index|
-      "#{SQLToolkit.quote(row[index])} AS #{SQLToolkit.safe_identifier(field.to_s)}"
+      "#{Selekt.quote(row[index])} AS #{Selekt.safe_identifier(field.to_s)}"
     end.join(', ')
   end
 
   def row_sql_without_names(row)
     'SELECT ' + fields.map.with_index do |field, index|
-      SQLToolkit.quote(row[index])
+      Selekt.quote(row[index])
     end.join(', ')
   end
 end

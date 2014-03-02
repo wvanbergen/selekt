@@ -1,10 +1,10 @@
 require 'test_helper'
 
-class SQLToolkitTest < Minitest::Test
+class SelektTest < Minitest::Test
 
   def test_safe_identifier
-    assert_equal 'test', SQLToolkit.safe_identifier('test')
-    assert_equal %q["test'"], SQLToolkit.safe_identifier(%q[test'])
-    assert_equal %q["""test"""], SQLToolkit.safe_identifier(%q["test"])
+    assert_equal 'test', Selekt.safe_identifier('test')
+    assert_equal %q["test'"], Selekt.safe_identifier(%q[test'])
+    assert_equal %q["""test"""], Selekt.safe_identifier(%q["test"])
   end
 end

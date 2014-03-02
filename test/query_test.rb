@@ -4,11 +4,11 @@ class QueryTest < Minitest::Test
 
   def test_sql_roundtrip
     query = 'select * from table'
-    assert_equal query, SQLToolkit.parse(query).sql
+    assert_equal query, Selekt.parse(query).sql
   end
 
   def test_sources
-    source_names = SQLToolkit.parse(<<-SQL).source_names
+    source_names = Selekt.parse(<<-SQL).source_names
       SELECT *
         FROM schema.table1
         LEFT JOIN table2 t2 ON t1.id = t2.id
@@ -20,10 +20,10 @@ class QueryTest < Minitest::Test
   end
 
   def test_stubbing_sources
-    query = SQLToolkit.parse('select * from t1')
+    query = Selekt.parse('select * from t1')
     assert_equal "select * from (select 1) AS t1", query.stub('t1', 'select 1').sql
 
-    t1_stub = SQLToolkit::SourceStub.new(:field_1, :field_2)
+    t1_stub = Selekt::SourceStub.new(:field_1, :field_2)
     t1_stub << ['test', 123]
     t1_stub << ['test', 456]
     t1_stub << ['test', 789]
@@ -32,13 +32,13 @@ class QueryTest < Minitest::Test
   end
 
   def test_relations
-    assert_equal ['a', 'b'], SQLToolkit.parse('select * from a t1, b t2').relations.map(&:table_name)
+    assert_equal ['a', 'b'], Selekt.parse('select * from a t1, b t2').relations.map(&:table_name)
 
-    query = SQLToolkit.parse('select * from schema.table t1 INNER JOIN schema.table t2 ON 1=1')
+    query = Selekt.parse('select * from schema.table t1 INNER JOIN schema.table t2 ON 1=1')
     assert_equal ["schema"], query.relations.map(&:schema_name)
     assert_equal ["table"], query.relations.map(&:table_name)
     
-    query = SQLToolkit.parse(<<-SQL)
+    query = Selekt.parse(<<-SQL)
       SELECT *
         FROM schema."table1" t1
         LEFT JOIN table2 t2 ON t1.id = t2.id

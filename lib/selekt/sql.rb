@@ -1,4 +1,4 @@
-module SQLToolkit
+module Selekt
   module SQL
     module TableReference
       def variable_name

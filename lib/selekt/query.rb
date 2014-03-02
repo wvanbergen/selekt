@@ -1,11 +1,11 @@
-class SQLToolkit::Query
+class Selekt::Query
 
   class Relation < Struct.new(:schema_name, :table_name)
     def to_s
       if schema_name.nil?
-        SQLToolkit.safe_identifier(table_name)
+        Selekt.safe_identifier(table_name)
       else
-        SQLToolkit.safe_identifier(schema_name) + '.' + SQLToolkit.safe_identifier(table_name)
+        Selekt.safe_identifier(schema_name) + '.' + Selekt.safe_identifier(table_name)
       end
     end
   end
@@ -13,15 +13,15 @@ class SQLToolkit::Query
   attr_reader :ast
 
   def initialize(sql)
-    @ast = SQLToolkit.parser.parse(sql) or raise SQLToolkit::ParseError.new("Could not parse SQL query: #{sql}")
+    @ast = Selekt.parser.parse(sql) or raise Selekt::ParseError.new("Could not parse SQL query: #{sql}")
   end
 
   def relations
-    find_nodes(ast, SQLToolkit::SQL::TableReference).map { |tr| Relation.new(tr.schema_name, tr.table_name) }.uniq
+    find_nodes(ast, Selekt::SQL::TableReference).map { |tr| Relation.new(tr.schema_name, tr.table_name) }.uniq
   end
 
   def sources
-    find_nodes(ast, SQLToolkit::SQL::Source)
+    find_nodes(ast, Selekt::SQL::Source)
   end
 
   def source_names

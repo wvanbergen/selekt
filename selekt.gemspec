@@ -1,16 +1,16 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'sql_toolkit/version'
+require 'selekt/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "sql_toolkit"
-  gem.version       = SQLToolkit::VERSION
+  gem.name          = "selekt"
+  gem.version       = Selekt::VERSION
   gem.authors       = ["Willem van Bergen"]
   gem.email         = ["willem@railsdoctors.com"]
   gem.description   = %q{A toolkit to work with the SQL language. Incluses a SQL parser, tree manipulations, and tools for testing and monitoring}
   gem.summary       = %q{Toolkit to work with SQL queries}
-  gem.homepage      = "https://github.com/wvanbergen/sql_toolkit"
+  gem.homepage      = "https://github.com/wvanbergen/selekt"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }

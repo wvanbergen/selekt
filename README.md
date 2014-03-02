@@ -1,4 +1,4 @@
-# SQL toolkit [![Build Status](https://travis-ci.org/wvanbergen/sql_toolkit.png)](https://travis-ci.org/wvanbergen/sql_toolkit)
+# Selekt [![Build Status](https://travis-ci.org/wvanbergen/selekt.png)](https://travis-ci.org/wvanbergen/selekt)
 
 A toolkit to work with SQL queries, mostly for building test suites around
 applications that use complex SQL queries. It includes:
@@ -19,11 +19,8 @@ for PostgreSQL and Vertica extensions.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'sql_toolkit'
-
-And run `bundle install`.
+Add this line to your application's Gemfile: `gem 'selekt'` 
+and run `bundle install`.
 
 ## Usage
 
@@ -45,12 +42,12 @@ SQL
 # fixture sets, which would be hard and slow. Let's stub them 
 # out instead.
 
-query = SQLToolkit.parse(view_definition)
+query = Selekt.parse(view_definition)
 
-customers = SQLToolkit::SourceStub.new(:customer_id, :name)
+customers = Selekt::SourceStub.new(:customer_id, :name)
 customers << [1, "Willem"]
 
-single_sale = SQLToolkit::SourceStub.new(:sale_id, :customer_id, :timestamp)
+single_sale = Selekt::SourceStub.new(:sale_id, :customer_id, :timestamp)
 single_sale << [1, 1, Time.now]
 
 # Replace the c and s source (the customers and sales tables) with our stubs
@@ -62,7 +59,7 @@ assert_equal 1, result.rows.length
 assert_equal true, result.rows[0][:active]
 
 # Now let's try it with a sale that should not be counted.
-old_sale = SQLToolkit::SourceStub.new(:sale_id, :customer_id, :timestamp)
+old_sale = Selekt::SourceStub.new(:sale_id, :customer_id, :timestamp)
 old_sale << [1, 1, Time.now - 2.months]
 stubbed_query = query.stub('c', customers).stub('s', old_sale)
 
@@ -71,7 +68,7 @@ assert_equal 1, result.rows.length
 assert_equal false, result.rows[0][:active]
 
 # Finally, let's try it with an unrelated sale
-no_sale = SQLToolkit::SourceStub.new(:sale_id, :customer_id, :timestamp)
+no_sale = Selekt::SourceStub.new(:sale_id, :customer_id, :timestamp)
 no_sale << [1, 2, Time.now] # use a different customer_id
 stubbed_query = query.stub('c', customers).stub('s', no_sale)
 
@@ -87,13 +84,13 @@ to run these tests.
 
 ### SourceStub
 
-You don't have to use a `SQLToolkit::SourceStub` object when calling 
+You don't have to use a `Selekt::SourceStub` object when calling 
 `query.stub(name, stub)`; any SQL query that the library can parse will be 
 accepted. A source stub will simply generate a SQL query by joining
 a static SELECT query for every row using UNION ALL:
 
 ``` ruby
-customers = SQLToolkit::SourceStub.new(:customer_id, :name)
+customers = Selekt::SourceStub.new(:customer_id, :name)
 customers << [1, "Willem"]
 customers << [2, "Aaron"]
 customers.sql

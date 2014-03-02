@@ -1,4 +1,4 @@
-module SQLToolkit
+module Selekt
 
   grammar SQL
 
@@ -247,7 +247,7 @@ module SQLToolkit
         end
 
         def reserved?
-          SQLToolkit::RESERVED_SQL_KEYWORDS.include?(text_value.downcase)
+          Selekt::RESERVED_SQL_KEYWORDS.include?(text_value.downcase)
         end
       }
     end
